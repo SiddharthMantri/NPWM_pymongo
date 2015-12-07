@@ -11,6 +11,25 @@ CORS(app)
 connection = MongoClient('mongodb://npwm_admin:pass123@ds061984.mongolab.com:61984/heroku_4j8g2kcv')
 db = connection.heroku_4j8g2kcv
 
+@app.route("/cuisines", methods=['GET'])
+def cuisines():
+	arr = []
+	c = db.restaurant.find().distinct("cuisine")
+	json_docs = [json.dumps(document, default=json_util.default) for document in c]
+	if len(json_docs) is not 0:
+		for jsondump in json_docs:
+			arr.append(json.loads(jsondump))
+		return Response(json.dumps({
+			'success': True,
+			'response': arr
+			}), status=200, content_type='application/json')
+	else:
+		return Response(json.dumps({
+			'success': False,
+			'response': 'No Data'
+			}))
+
+
 @app.route("/search", methods=['GET'])
 def search():
 	q =  request.args['q']
