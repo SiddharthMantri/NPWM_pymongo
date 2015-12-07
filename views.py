@@ -15,8 +15,8 @@ db = connection.heroku_4j8g2kcv
 def search():
 	q =  request.args['q']
 	arr = []
-	reg = r"\b(?=\w)" + re.escape(q) + r"\b(?!\w)"
-	x = db.restaurant.find({"name" : {'$regex': q}})
+	reg = r".*(?i)"+re.escape(q)+".*"
+	x = db.restaurant.find({"name" : {'$regex': reg}})
 	json_docs = [json.dumps(document, default=json_util.default) for document in x]
 	if len(json_docs) is not 0:
 		for jsondump in json_docs:
