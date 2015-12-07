@@ -7,7 +7,7 @@ import re
 from flask.ext.cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 connection = MongoClient('mongodb://npwm_admin:pass123@ds061984.mongolab.com:61984/heroku_4j8g2kcv')
 db = connection.heroku_4j8g2kcv
 
