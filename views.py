@@ -8,14 +8,16 @@ from flask.ext.cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-connection = MongoClient('mongodb://bhavin:pass123@ds059694.mongolab.com:59694/npm_db')
-db = connection.npm_db
+connection = MongoClient('mongodb://npwm_admin:pass123@ds061984.mongolab.com:61984/heroku_4j8g2kcv')
+db = connection.heroku_4j8g2kcv
+
 @app.route("/search", methods=['GET'])
 def search():
 	q =  request.args['q']
 	arr = []
 	reg = r"\b(?=\w)" + re.escape(q) + r"\b(?!\w)"
-	json_docs = [json.dumps(document, default=json_util.default) for document in db.Restaurants.find({"name" : {'$regex': reg}})]
+	x = db.restaurant.find({"name" : {'$regex': q}})
+	json_docs = [json.dumps(document, default=json_util.default) for document in x]
 	if len(json_docs) is not 0:
 		for jsondump in json_docs:
 			arr.append(json.loads(jsondump))
@@ -29,10 +31,10 @@ def search():
 			'response': 'No Data'
 			}))
 
-@app.route('/tweet/<comment_id>', methods=['GET', 'POST'])
-def tweet_detail(comment_id=None):
+@app.route('/restaurant/<restaurant_id>', methods=['GET', 'POST'])
+def tweet_detail(restaurant_id=None):
 	if request.method == 'GET':
-		tweet = db.restaurant.find({"id": int(comment_id)})
+		tweet = db.restaurant.find({"restaurant_id": restaurant_id})
 		json_docs = []
 		for doc in tweet:
 			json_doc = json.dumps(doc, default=json_util.default)
@@ -42,8 +44,9 @@ def tweet_detail(comment_id=None):
 				'response': json_docs
 				}), status=200, content_type='application/json')
 	elif request.method == 'POST':
-		tweet = db.tweets.update({"id": int(comment_id)}, {"$addToSet": {"review": request.form['comment']}})
-		updated = db.tweets.find({"id": int(comment_id)})
+		comments = [request.form['comment']]
+		tweet = db.restaurant.update({"id": restaurant_id}, {"$addToSet": {"review": comments}},  upsert=True)
+		updated = db.restaurant.find({"restaurant_id": restaurant_id})
 		json_docs = []
 		for doc in updated:
 			json_doc = json.dumps(doc, default=json_util.default)
