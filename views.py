@@ -45,7 +45,8 @@ def tweet_detail(restaurant_id=None):
 				}), status=200, content_type='application/json')
 	elif request.method == 'POST':
 		comments = [request.form['comment']]
-		tweet = db.restaurant.update({"id": restaurant_id}, {"$addToSet": {"review": comments}},  upsert=True)
+		print comments
+		tweet = db.restaurant.update({"restaurant_id": restaurant_id}, {"$addToSet": {"review": {'$each': comments}}},  upsert=True)
 		updated = db.restaurant.find({"restaurant_id": restaurant_id})
 		json_docs = []
 		for doc in updated:
