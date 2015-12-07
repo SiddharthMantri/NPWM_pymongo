@@ -34,8 +34,9 @@ def cuisines():
 def search():
 	q =  request.args['q']
 	arr = []
-	reg = r".*(?i)"+re.escape(q)+".*"
-	x = db.restaurant.find({"name" : {'$regex': reg}})
+	a = q.replace('-', ' ')
+	reg = r".*(?i)"+re.escape(a)+".*"
+	x = db.restaurant.find({"cuisine" : {'$regex': reg}})
 	json_docs = [json.dumps(document, default=json_util.default) for document in x]
 	if len(json_docs) is not 0:
 		for jsondump in json_docs:
